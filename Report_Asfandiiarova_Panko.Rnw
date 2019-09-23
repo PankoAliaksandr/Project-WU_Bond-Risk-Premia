@@ -1,0 +1,408 @@
+\documentclass{article}
+
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{eurosym}
+\usepackage{color}
+\usepackage{float}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{amsthm}
+\usepackage{thmtools}
+\usepackage{amssymb}
+\usepackage{listings}
+\usepackage{prettyref}
+\usepackage{bbold}
+\usepackage{graphicx}
+\usepackage{paralist}
+\usepackage{fullpage}
+\usepackage{float}
+\restylefloat{table}
+
+\title{\vspace{-3cm}\textcolor{blue}{QFIN Portfolio Management Applications\\
+  \large Assignment IV - Bond Risk Premia}}
+\author{{Asfandiiarova, Panko}}
+
+
+
+\begin{document}
+
+
+\maketitle
+\section*{Presentation}
+\begin{itemize}
+\item Asfandiiarova can present
+\item Panko can present
+\end{itemize}
+
+
+\section*{Introduction}
+The main task was to estimate how well forward rates and  yields predict exess returns on bonds. In order to do this we followed the procedure presented in Cohrane, Piazzesi (2005) paper. They provided two ways of estimation: unrestricted with the one-step regressions and restricted with  two-steps regressions. In our assignment we are going to replicate this aproach and we will compare the final results.
+
+\subsection*{Data}
+In order to proceed with the analysis we first of all downloaded the data on prices of Fama
+Bliss Discount Bonds from WRDS. It starts from January, 1964 and ends in December, 2014.  This data was recent available. However, in their analysis Cohrane and Piazzesi used the time period from 1964 to 2003, therefore we first will make an analysis for the same time period and then extend it to the whole available data.  The initial data looks as the following:
+
+\begin{table}[H]
+\caption{Prices of Fama Bliss Discount Bonds}
+\resizebox{\textwidth}{!}{
+\centering
+\begin{tabular}{rrrrrrr}
+  \hline
+ & Quotation date  & Price for 1 year  & Price for 2 year  & Price for 3 year & Price for 4 year  & Price for 5 year \\ 
+  & of observation & artificial security & artificial security &  artificial security &  artificial security &  artificial security \\ 
+  \hline
+1 & 1964-01-31 & 96.29 & 92.50 & 88.85 & 85.40 & 81.92 \\ 
+  2 & 1964-02-28 & 96.14 & 92.34 & 88.62 & 85.16 & 81.76 \\ 
+  3 & 1964-03-31 & 96.17 & 92.17 & 88.36 & 84.73 & 81.59 \\ 
+   ...& ...& ... & ... & ... & ... & ... \\
+ 610 & 2014-10-31 & 99.87 & 98.98 & 97.13 & 94.64 & 92.17 \\ 
+  611 & 2014-11-28 & 99.83 & 99.04 & 97.34 & 95.08 & 92.80 \\ 
+  612 & 2014-12-31 & 99.74 & 98.64 & 96.73 & 94.27 & 92.05 \\  
+
+   \hline
+\end{tabular}}
+\end{table}
+
+
+
+\section*{I question}
+In the first step, we need to calculate log prices and log yields from the given data.
+
+The formula for log yield looks like:
+\[ y_t^{(n)} = \frac{1}{n} p_t^{(n)} \]
+where $p_t^{(n)}$ are the log price of n-year discount bond at time t.
+
+In the next step, we also calculated forward rates at time t for loans between time $t+n-1$ and $t+n$, which are defined by the authors as:
+\[ f_t^{(n)} = p_t^{(n-1)} - p_t^{(n)}.\]
+Thus we got forward rates for 4 bonds (with 2,3,4 and 5 years maturity)
+\\
+Furthermore, we calculated the excess log return with the following formula:
+\[r_{t+1}^{(n)}=p_{t+1}^{(n-1)}-p_t^{(n)},\]
+
+where $p_{t+1}^{(n-1)} - p_t^{(n)}$ is the log holding period return from buying a n-year bond at time $t$ and selling it as an $n-1$ year bond at time $t-1$.
+
+
+
+Finally, in the last step log excess returns are calculated using this formula:
+
+\[rx_{t+1}^{(n)}=r_{t+1}^{(n)}-y_t^{(1)}\]
+\begin{figure}[H]
+\caption{Excess  Log Returns}
+\centering
+\includegraphics [width=12cm,height=\textheight,keepaspectratio]{EReturns.jpeg}
+\end{figure}
+
+After we did all the data preparation, we can finally start the procedure from the paper.
+
+\subsection*{Unrestricted regression}
+Firstly, we use the formula presented by the authors for unrestricted one-step regression:
+\[rx_{t+1}^{(n)}=\beta_0^{(n)}+\beta_1^{(n)} y_t^{(1)}+\beta_2^{(n)}f_t^{(2)}+...+\beta_5^{(n)} f_t^{(5)}+\epsilon_{t+1}^{(n)}\]
+
+
+ We got the following betas from the first regression (regressions of excess returns on all
+forward rates):
+\begin{table}[H]
+\caption{Beta Coefficients and P-values for unrestricted model (1964-2003)}
+\centering
+\begin{tabular}{rrrrr}
+  \hline
+Coefficients & 2Y & 3Y & 4Y & 5Y \\ 
+  \hline
+beta1 & -0.9376 & -1.7103 & -2.4805 & -3.0997 \\ 
+p-values & 0.0000 & 0.0000 & 0.0000 & 0.0000 \\ 
+beta2 & 0.4697 & 0.3245 & 0.5956 & 0.8959 \\ 
+p-values & 0.0654 & 0.4793 & 0.3371 & 0.2482 \\ 
+beta3 & 1.1733 & 3.0102 & 3.5330 & 4.0256 \\  
+p-values & 0.0000 & 0.0000 & 0.0000 & 0.0000 \\ 
+beta4 & 0.3342 & 0.4612 & 1.3848 & 1.3736 \\ 
+p-values & 0.0335 & 0.1032 & 0.0003 & 0.0042 \\
+beta5 & -0.8187 & -1.7449 & -2.5828 & -2.6487 \\ 
+p-values & 0.0000 & 0.0000 & 0.0000 & 0.0000 \\ 
+   \hline
+\end{tabular}
+\end{table}
+
+The graphical results can be found on figure 2, which presents coefficients $[\beta_1^{(n)},...,\beta_5^{(n)}]$ as a function of maturity n:
+
+\begin{figure}[H]
+\caption{REGRESSION COEFFICIENTS OF ONE-YEAR EXCESS
+RETURNS ON FORWARD RATES}
+\centering
+\includegraphics [width=12cm,height=\textheight,keepaspectratio]{unrestricted1.jpeg}
+\end{figure}
+
+Our results are fairly the same as in the paper. The pattern in betas is more or less the same, meaning that the same function of forward rates forecasts
+holding period returns at all maturities. Longer maturities just have greater loadings on
+this same function. 
+
+From the statistical point of view almost all coefficients are significant except of ones for $\beta_2$. However, the residuals are not normally distributed meaning that p-values in this case may be misleading.
+
+
+
+\subsection*{Restricted Regression}
+Further, we did two-steps estimations for the restricted model in order to estimate expected excess returns of all maturities in terms of a single factor:
+
+\[rx_{t+1}^{(n)}=b_n (\gamma_0+\gamma_1 y_t^{(1)}+\gamma_2 f_t^{(2)}+...+\gamma_5  f_t^{(5)})+\epsilon_{t+1}^{(n)}\]
+These two steps are the following:
+the first step is to estimate the $\gamma$ by running a regression of the average excess returns
+\[ 1) \quad \overline{rx}_{t+1}= \gamma_0+\gamma_1 y_t^{(1)}+\gamma_2 f_t^{(2)}+...+\gamma_5  f_t^{(5)}+\bar{\epsilon}_{t+1},\]
+\[\overline{rx}_{t+1}= \mathbf{\gamma}^T \mathbf{f}_t + \bar{\epsilon}_{t+1}\]
+
+where $\overline{rx}_{t+1}$ is the average (across maturity) excess return on all forward rates.
+\[\overline{rx}_{t+1}=\frac{1}{4} \sum_{n=2}^5 rx_{t+1}^{(n)}\]
+
+\begin{table}[H]
+\caption{Estimates of the return-forecasting factor $\overline{rx}_{t+1}= \mathbf{\gamma}^T \mathbf{f}_t + \bar{\epsilon}_{t+1}$}
+\centering
+\begin{tabular}{rrrrrrrr}
+  \hline
+& $\gamma_0$ & $\gamma_1$ & $\gamma_2$& $\gamma_3$&$\gamma_4$ & $\gamma_5$ & $R^2$ \\ 
+  \hline
+OLS estimates & -0.0318 & -2.0570  & 0.5714 & 2.9355 &  0.8884 & -1.9488 &  0.3483\\ 
+
+\end{tabular}
+\end{table}
+
+
+\begin{table}[H]
+\caption{Pvalues of the estimates$\overline{rx}_{t+1}= \mathbf{\gamma}^T \mathbf{f}_t + \bar{\epsilon}_{t+1}$}
+\centering
+\begin{tabular}{rrrrrrr}
+  \hline
+ & $\gamma_0$ & $\gamma_1$ & $\gamma_2$ & $\gamma_3$ & $\gamma_4$ & $\gamma_5$  \\ 
+  \hline
+  Pvalues & 0.0000 & 0.0000 & 0.2749 & 0.0000 & 0.0061 & 0.0000 
+  
+\end{tabular}
+\end{table}
+
+We can conclude that except of $\gamma_2$ coefficients are all significant at 5\% level of significance. $R^2$ is about 34\% that for predictive regression is very high. However, signs of coefficients are alternating that for us a bit suspicious.\\
+
+The second step is the estimation of $b_n$ by running the four regressions:
+\[ 2) \quad rx_{t+1}^{(n)}= b_n (\mathbf{\gamma}^T \mathbf{f}_t) + \epsilon_{t+1}^{(n)}\]
+
+\begin{table}[H]
+\caption{Betas (for the 1964-2003 time period)}
+\centering
+\begin{tabular}{rrrrrrr}
+  \hline
+ & beta \\ 
+  \hline
+1 & 0.4629 \\ 
+  2 & 0.8656 \\ 
+  3 & 1.2362 \\ 
+  4 & 1.4353 \\ 
+   \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\caption{pvalues for betas (for the 1964-2003 time period)}
+\centering
+\begin{tabular}{rrrrrrr}
+  \hline
+ & pvalue \\ 
+  \hline
+1 & 0.0000 \\ 
+  2 & 0.0000 \\ 
+  3 & 0.0000 \\ 
+  4 & 0.0000 \\ 
+   \hline
+\end{tabular}
+\end{table}
+
+This time the result are almost the same as in paper, however the reason for the difference is not clear. It could be caused by rounding.
+
+Finally, we calculate final coefficients as a product of coefficients from 2 regressions (1st and 2nd step):
+
+
+\begin{table}[H]
+\caption{Beta Coefficients for restricted model (1964-2003)}
+\centering
+\begin{tabular}{rrrrr}
+  \hline
+Coefficients & 2Y & 3Y & 4Y & 5Y \\
+  \hline
+  beta1 & -0.95 & -1.78 & -2.54 & -2.95 \\ 
+  beta2 & 0.26 & 0.49 & 0.71 & 0.82 \\ 
+  beta3 & 1.36 & 2.54 & 3.63 & 4.21 \\ 
+  beta4 & 0.41 & 0.77 & 1.10 & 1.28 \\ 
+  beta5 & -0.90 & -1.69 & -2.41 & -2.80 \\
+   \hline
+\end{tabular}
+\end{table}
+
+
+\begin{figure}[H]
+\caption{REGRESSION COEFFICIENTS OF ONE-YEAR EXCESS
+RETURNS ON FORWARD RATES}
+\centering
+\includegraphics [width=12cm,height=\textheight,keepaspectratio]{restricted1.jpeg}
+\end{figure}
+
+As we can see at figure 3 the results are very similar to unrestricted case and fairly the same as represented in the paper.
+
+\section*{II question}
+Since only the period has been extended in this section, we show only the final results.
+
+
+\subsection*{Unrestricted Case}
+\begin{table}[H]
+\caption{Beta Coefficients for unrestricted model (1964-2014)}
+\centering
+\begin{tabular}{rrrrr}
+  \hline
+ & 1 & 2 & 3 & 4 \\ 
+  \hline
+1 & -0.0076 & -0.0106 & -0.0158 & -0.0227 \\ 
+  2 & -0.6295 & -1.1007 & -1.6045 & -1.9817 \\ 
+  3 & 0.0338 & -0.5592 & -0.6979 & -0.8000 \\ 
+  4 & 0.6917 & 2.0409 & 2.1228 & 2.2130 \\ 
+  5 & 0.5020 & 0.8249 & 1.9418 & 2.1375 \\ 
+  6 & -0.4684 & -1.0365 & -1.5481 & -1.3003 \\ 
+   \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\caption{P-values for unrestricted model (1964-2014)}
+\centering
+\begin{tabular}{rrrrr}
+  \hline
+ & 1 & 2 & 3 & 4 \\ 
+  \hline
+1 & 0.0006 & 0.0088 & 0.0043 & 0.0010 \\ 
+  2 & 0.0000 & 0.0000 & 0.0000 & 0.0000 \\ 
+  3 & 0.8852 & 0.1911 & 0.2320 & 0.2730 \\ 
+  4 & 0.0005 & 0.0000 & 0.0000 & 0.0003 \\ 
+  5 & 0.0006 & 0.0019 & 0.0000 & 0.0000 \\ 
+  6 & 0.0000 & 0.0000 & 0.0000 & 0.0002 \\ 
+   \hline
+\end{tabular}
+\end{table}
+
+As we can see the same picture only one $\beta_3$ is insignificant.
+
+\begin{figure}[H]
+\caption{REGRESSION COEFFICIENTS OF ONE-YEAR EXCESS
+RETURNS ON FORWARD RATES}
+\centering
+\includegraphics [width=12cm,height=\textheight,keepaspectratio]{unrestricted2.jpeg}
+\end{figure}
+
+As we can notice the pattern has changed significantly compared to previous analized period.
+
+\subsection*{Restricted Case}
+
+\begin{table}[H]
+\caption{Estimates of the return-forecasting factor (for the 1964-2014 time period) $\overline{rx}_{t+1}= \mathbf{\gamma}^T \mathbf{f}_t + \bar{\epsilon}_{t+1}$}
+\centering
+\begin{tabular}{rrrrrrrr}
+  \hline
+& $\gamma_0$ & $\gamma_1$ & $\gamma_2$& $\gamma_3$&$\gamma_4$ & $\gamma_5$ & $R^2$ \\ 
+  \hline
+OLS estimates & -0.0142 &  -1.3291  & -0.5058 &  1.7671 &  0.8884 &     1.3516&   -1.0883 \\ 
+
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\caption{Pvalues of the estimates$\overline{rx}_{t+1}= \mathbf{\gamma}^T \mathbf{f}_t + \bar{\epsilon}_{t+1}$}
+\centering
+\begin{tabular}{rrrrrrr}
+  \hline
+ & $\gamma_0$ & $\gamma_1$ & $\gamma_2$ & $\gamma_3$ & $\gamma_4$ & $\gamma_5$  \\ 
+  \hline
+  Pvalues & 0.0023 & 0.0000 & 0.3021 & 0.0000 & 0.0000 & 0.0000 
+  
+\end{tabular}
+\end{table}
+
+Same here $\gamma_3$ is insignificant.
+
+For the step 2 we have the next result:
+
+\begin{table}[H]
+\caption{Beta Coefficients for restricted model (1964-2014)}
+\centering
+\begin{tabular}{rrrrrrr}
+  \hline
+ & beta \\ 
+  \hline
+1 & 0.4492 \\ 
+  2 & 0.8516 \\ 
+  3 & 1.2479 \\ 
+  4 & 1.4512 \\ 
+   \hline
+\end{tabular}
+\end{table}
+
+\begin{table}[H]
+\caption{pvalues for betas (for the 1964-2014 time period)}
+\centering
+\begin{tabular}{rrrrrrr}
+  \hline
+ & pvalue \\ 
+  \hline
+1 & 0.0000 \\ 
+  2 & 0.0000 \\ 
+  3 & 0.0000 \\ 
+  4 & 0.0000 \\ 
+   \hline
+\end{tabular}
+\end{table}
+
+Here all coefficients are significant. The difference compared to previous case is not big. This supports the model as being robust.
+
+The final coefficients are:
+
+\begin{table}[H]
+\caption{Beta Coefficients for restricted model (1964-2014)}
+\centering
+\begin{tabular}{rrrrr}
+  \hline
+Coefficients & 2Y & 3Y & 4Y & 5Y \\
+  \hline
+ beta1 & -0.60 & -1.13 & -1.66 & -1.93 \\ 
+   beta2 & -0.23 & -0.43 & -0.63 & -0.73 \\ 
+   beta3 & 0.79 & 1.50 & 2.21 & 2.56 \\ 
+   beta4 & 0.61 & 1.15 & 1.69 & 1.96 \\ 
+   beta5 & -0.49 & -0.93 & -1.36 & -1.58 \\ 
+   \hline
+\end{tabular}
+\end{table}
+
+
+
+\begin{figure}[H]
+\caption{REGRESSION COEFFICIENTS OF ONE-YEAR EXCESS
+RETURNS ON FORWARD RATES}
+\centering
+\includegraphics [width=12cm,height=\textheight,keepaspectratio]{restricted2.jpeg}
+\end{figure}
+
+\section*{III question}
+
+\subsection*{Results Interpretation and Discussion}
+Overall, our results are more or less the same as in the paper, however there are some minor differences in numbers. As we can see for the whole period we have a difference in pattern.The results are are skewed to the right and not symmetric any more. Additionally $R^2$ for the original period is higher than for the whole periods for all maturities. \\
+
+Moreover, from the plot of the unrestrictred model we can conclude that the excess returns of bonds with longer maturity are more sensetive to forward-rates changes than the short-term bonds returns.\\
+
+Additionally, we have noticed that the loadings $b_n$ of expected returns on the return-forecasting factor $\gamma^Tf$ increase smoothly with maturity.
+
+\subsection*{Alternative Approaches}
+\begin{enumerate}
+  \item  Ilmanen in 2009  showed correlation of +0.31 between expected 10-year inflation and future (next 5 years) excess returns of 7 to 10-year Treasuries. \\
+  Additionally, Cieslak and Povala (2015) decomposed Treasury yields into inflation expectations and maturity-specific interest rate cycles. Constructed risk premium factor forecasts excess bond returns in and out of sample and subsumes the common bond return predictor obtained as a linear combination of forward rates.
+  
+  \item Equity markets: High equity returns lead to increase in interest rates, when high equity market volatility in average leads to higher returns.
+  \item Central bank policy: Schmeling and Wagner (2017) find that a positive tone of central bank communication leads to an increase of government bond yields, with a higher impact on longer maturities.
+\end{enumerate}
+
+
+
+
+\end{document}
